@@ -17,7 +17,7 @@ The model files in `models\` must be present when the service starts. The app do
 
 ## Deploy on Render
 
-Push this repository, including the `models\` directory, to a Git provider. In Render, choose **New → Blueprint**, select the repository, and deploy using `render.yaml`. The service serves the frontend and prediction API from the same origin. The blueprint uses Render's Standard plan to provide memory for TensorFlow; this is a paid hosting plan.
+Push this repository, including the `models\` directory, to a Git provider. In Render, choose **New → Blueprint**, select the repository, and deploy using `render.yaml`. The service serves the frontend and prediction API from the same origin. The blueprint uses Render's Free plan; its memory limit may be insufficient to run TensorFlow and the model reliably.
 
 Uploaded images are sent to the service for inference and are not retained by this application. The hosting provider may independently retain operational request metadata under its own policies.
 
