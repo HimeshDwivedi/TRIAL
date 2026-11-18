@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7f2">
+    <meta name="description" content="A private, educational skin image screening tool.">
+    <title>SkinCheck — Skin image screening</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="SkinCheck home">
+        <span class="brand-mark" aria-hidden="true">+</span>
+        <span>skincheck</span>
+      </a>
+      <span class="privacy-note"><span class="privacy-dot"></span> Private by design</span>
+    </header>
+
+    <main>
+      <section class="intro">
+        <p class="eyebrow">A helpful first look, not a diagnosis</p>
+        <h1>Get to know your<br><span>skin a little better.</span></h1>
+        <p class="intro-copy">Upload a clear image for an AI-generated classification. Your image is processed for this result only and is not saved.</p>
+      </section>
+
+      <section class="workspace" aria-label="Skin image screening">
+        <div class="upload-card">
+          <div class="card-heading">
+            <div>
+              <p class="step-label">01 <span>—</span> Add an image</p>
+              <h2>Choose a skin image</h2>
+            </div>
+            <span class="file-limit">JPG, PNG, WEBP · up to 10 MB</span>
+          </div>
+
+          <label class="dropzone" id="dropzone" for="image-input" tabindex="0">
+            <input id="image-input" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+            <span class="upload-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="drop-title">Drop your image here</span>
+            <span class="drop-copy">or <span>browse files</span> on your device</span>
+            <span class="image-preview" id="image-preview" hidden></span>
+          </label>
+
+          <div class="selected-file" id="selected-file" hidden>
+            <span class="file-name" id="file-name"></span>
+            <button class="remove-button" id="remove-image" type="button" aria-label="Remove selected image">Remove</button>
+          </div>
+
+          <button class="analyze-button" id="analyze-button" type="button" disabled>
+            <span id="button-label">Analyze image</span>
+            <span aria-hidden="true">↗</span>
+          </button>
+          <p class="status-message" id="status-message" role="status" aria-live="polite"></p>
+          <p class="privacy-caption"><span aria-hidden="true">◉</span> No account. No upload history. No prediction history.</p>
+        </div>
+
+        <aside class="info-panel">
+          <span class="info-icon" aria-hidden="true">✳</span>
+          <p class="eyebrow">How it works</p>
+          <h2>A simple, private check-in.</h2>
+          <ol class="steps">
+            <li><span>1</span><p>Choose a well-lit, in-focus image.</p></li>
+            <li><span>2</span><p>Our model checks it for visual patterns.</p></li>
+            <li><span>3</span><p>Review the result, then speak with a clinician.</p></li>
+          </ol>
+          <div class="disclaimer">
+            <strong>Important to know</strong>
+            <p>This experimental tool can make mistakes. It cannot diagnose skin conditions or replace advice from a qualified healthcare professional.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="results" id="results" aria-labelledby="results-title" hidden>
+        <div class="results-heading">
+          <div>
+            <p class="step-label">02 <span>—</span> Your result</p>
+            <h2 id="results-title">Model classification</h2>
+          </div>
+          <button class="start-over" id="start-over" type="button">Start over</button>
+        </div>
+        <div class="result-list" id="result-list"></div>
+        <p class="result-disclaimer">These are model-generated estimates, not a diagnosis. Please consult a dermatologist about any skin changes or concerns.</p>
+      </section>
+    </main>
+
+    <footer>
+      <span>SkinCheck <span class="footer-divider">·</span> Educational use only</span>
+      <span>Your image is processed for this request and not retained.</span>
+    </footer>
+  </body>
+</html>
