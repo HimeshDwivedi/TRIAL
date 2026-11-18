@@ -23,6 +23,6 @@ Uploaded images are sent to the service for inference and are not retained by th
 
 ## Deploy the frontend on Vercel
 
-Deploy the backend on Render first. Copy the service URL shown by Render, then update the destination in `frontend\vercel.json` if your Render URL is not `https://skincheck.onrender.com`.
+Deploy the backend on Render first. Copy the service URL shown by Render, then update the destination host in `frontend\vercel.json` if your Render URL is different. Keep the `/api/:path*` suffix so API requests reach the matching backend route.
 
 Import the same Git repository in Vercel and set **Root Directory** to `frontend`. Select **Other** as the framework preset, leave the build command empty, and set **Output Directory** to `.`. Deploy. The Vercel rewrite forwards `/api/*` to Render; the frontend and model API do not need separate CORS configuration.
