@@ -1,4 +1,4 @@
-services:
+git commit -m "Use Render free plan"services:
   - type: web
     name: skincheck
     runtime: python
