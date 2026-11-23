@@ -17,7 +17,6 @@ MODEL_PATH = MODEL_DIR / "effnet_finetuned.keras"
 LABELS_PATH = MODEL_DIR / "label_encoder.pkl"
 IMAGE_SIZE = (224, 224)
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
-MIN_PREDICTION_CONFIDENCE = 0.30
 
 
 @asynccontextmanager
@@ -89,14 +88,6 @@ def predict(file: Annotated[UploadFile, File()]):
     scores = probabilities[0]
     top_index = int(np.argmax(scores))
     top_confidence = float(scores[top_index])
-    if top_confidence < MIN_PREDICTION_CONFIDENCE:
-        return {
-            "predictions": [],
-            "message": (
-                "Cannot predict confidently: the highest class score is below 30%. "
-                "Try a clear skin-lesion image."
-            ),
-        }
 
     return {
         "predictions": [
