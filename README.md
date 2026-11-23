@@ -1,1 +1,2 @@
 this is simple.
+Prediction display filter: the API shows only the top class when its model score is at least 30%; below that it returns an inconclusive result. This is not a calibrated accuracy score or a reliable filter for non-skin images.

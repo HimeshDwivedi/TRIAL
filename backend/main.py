@@ -17,6 +17,7 @@ MODEL_PATH = MODEL_DIR / "effnet_finetuned.keras"
 LABELS_PATH = MODEL_DIR / "label_encoder.pkl"
 IMAGE_SIZE = (224, 224)
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+MIN_PREDICTION_CONFIDENCE = 0.30
 
 
 @asynccontextmanager
@@ -86,15 +87,24 @@ def predict(file: Annotated[UploadFile, File()]):
         raise RuntimeError("The classifier returned an invalid prediction.")
 
     scores = probabilities[0]
-    top_indices = np.argsort(scores)[::-1][:3]
+    top_index = int(np.argmax(scores))
+    top_confidence = float(scores[top_index])
+    if top_confidence < MIN_PREDICTION_CONFIDENCE:
+        return {
+            "predictions": [],
+            "message": (
+                "Cannot predict confidently: the highest class score is below 30%. "
+                "Try a clear skin-lesion image."
+            ),
+        }
+
     return {
         "predictions": [
             {
-                "class": app.state.labels[int(index)],
-                "confidence": round(float(scores[index]) * 100, 2),
+                "class": app.state.labels[top_index],
+                "confidence": round(top_confidence * 100, 2),
             }
-            for index in top_indices
-        ]
+        ],
     }
 
 

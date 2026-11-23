@@ -97,6 +97,10 @@ analyzeButton.addEventListener("click", async () => {
     const response = await fetch("/api/predict", { method: "POST", body });
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || "The image could not be analyzed.");
+    if (!data.predictions.length) {
+      statusMessage.textContent = data.message || "Cannot predict this image confidently.";
+      return;
+    }
     showResults(data.predictions);
   } catch (error) {
     statusMessage.textContent = error.message || "Unable to reach the service. Please try again.";
