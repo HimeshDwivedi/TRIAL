@@ -8,6 +8,7 @@ const buttonLabel = document.querySelector("#button-label");
 const statusMessage = document.querySelector("#status-message");
 const results = document.querySelector("#results");
 const resultList = document.querySelector("#result-list");
+const MIN_CONFIDENCE_PERCENT = 30;
 
 let selectedImage = null;
 let previewUrl = null;
@@ -99,6 +100,10 @@ analyzeButton.addEventListener("click", async () => {
     if (!response.ok) throw new Error(data.detail || "The image could not be analyzed.");
     if (!data.predictions.length) {
       statusMessage.textContent = data.message || "Cannot predict this image confidently.";
+      return;
+    }
+    if (!data.predictions.some((prediction) => prediction.confidence > MIN_CONFIDENCE_PERCENT)) {
+      statusMessage.textContent = "Cannot predict this image: confidence is too low (no class is above 30%).";
       return;
     }
     showResults(data.predictions);
