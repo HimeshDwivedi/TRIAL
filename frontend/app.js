@@ -96,8 +96,19 @@ analyzeButton.addEventListener("click", async () => {
 
   try {
     const response = await fetch("/api/predict", { method: "POST", body });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || "The image could not be analyzed.");
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      if (!response.ok) {
+        throw new Error(`The service returned an invalid response (HTTP ${response.status}). Please try again.`);
+      }
+      throw new Error("The service returned an empty or invalid response. It may have restarted while analyzing your image. Please try again.");
+    }
+    if (!response.ok) throw new Error((data && data.detail) || "The image could not be analyzed.");
+    if (!data || !Array.isArray(data.predictions)) {
+      throw new Error("The service returned an unexpected response. Please try again.");
+    }
     if (!data.predictions.length) {
       statusMessage.textContent = data.message || "Cannot predict this image confidently.";
       return;
@@ -108,7 +119,9 @@ analyzeButton.addEventListener("click", async () => {
     }
     showResults(data.predictions);
   } catch (error) {
-    statusMessage.textContent = error.message || "Unable to reach the service. Please try again.";
+    statusMessage.textContent = error instanceof TypeError
+      ? "Unable to reach the service. It may be restarting; please wait a moment and try again."
+      : error.message || "Unable to reach the service. Please try again.";
   } finally {
     analyzeButton.disabled = !selectedImage;
     buttonLabel.textContent = "Analyze image";

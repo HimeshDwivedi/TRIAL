@@ -17,12 +17,15 @@ MODEL_PATH = MODEL_DIR / "effnet_finetuned.keras"
 LABELS_PATH = MODEL_DIR / "label_encoder.pkl"
 IMAGE_SIZE = (224, 224)
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+MAX_IMAGE_PIXELS = 12_000_000
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     import tensorflow as tf
 
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+    tf.config.threading.set_inter_op_parallelism_threads(1)
     app.state.model = tf.keras.models.load_model(MODEL_PATH, compile=False)
     app.state.labels = [str(label) for label in joblib.load(LABELS_PATH).classes_]
     if app.state.model.input_shape != (None, *IMAGE_SIZE, 3):
@@ -71,17 +74,24 @@ def predict(file: Annotated[UploadFile, File()]):
         with Image.open(BytesIO(contents)) as uploaded_image:
             uploaded_image.verify()
         with Image.open(BytesIO(contents)) as uploaded_image:
-            if uploaded_image.width * uploaded_image.height > 25_000_000:
-                raise ValueError("Image dimensions are too large.")
+            if uploaded_image.width * uploaded_image.height > MAX_IMAGE_PIXELS:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Image dimensions must be 12 megapixels or smaller.",
+                )
+            if uploaded_image.format == "JPEG":
+                uploaded_image.draft("RGB", (IMAGE_SIZE[0] * 2, IMAGE_SIZE[1] * 2))
+            uploaded_image.thumbnail(
+                (IMAGE_SIZE[0] * 2, IMAGE_SIZE[1] * 2),
+                Image.Resampling.BILINEAR,
+            )
             image = ImageOps.exif_transpose(uploaded_image).convert("RGB")
             image = image.resize(IMAGE_SIZE, Image.Resampling.BILINEAR)
             pixels = np.asarray(image, dtype=np.float32)
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError, ValueError):
         raise HTTPException(status_code=400, detail="Please upload a valid image file.")
 
-    probabilities = np.asarray(
-        app.state.model.predict(np.expand_dims(pixels, axis=0), verbose=0)
-    )
+    probabilities = np.asarray(app.state.model(np.expand_dims(pixels, axis=0), training=False))
     if probabilities.shape != (1, len(app.state.labels)) or not np.isfinite(probabilities).all():
         raise RuntimeError("The classifier returned an invalid prediction.")
 
