@@ -114,7 +114,7 @@ analyzeButton.addEventListener("click", async () => {
       return;
     }
     if (!data.predictions.some((prediction) => prediction.confidence > MIN_CONFIDENCE_PERCENT)) {
-      statusMessage.textContent = "Cannot predict this image: confidence is too low (no class is above 30%).";
+      statusMessage.textContent = "Cannot predict this image.";
       return;
     }
     showResults(data.predictions);
